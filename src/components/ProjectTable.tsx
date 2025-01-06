@@ -1,17 +1,37 @@
 import { useState } from "react"
 import { data } from "../utils/data"
 import { BsThreeDots } from "react-icons/bs"
-import { AiOutlineDown } from "react-icons/ai"
+import { AiOutlineDown, AiOutlineUp } from "react-icons/ai"
 import { BiSort } from "react-icons/bi"
+import { MdSort } from "react-icons/md"
 
 const ProjectTable = () => {
 
-    const [projects,setProjects] = useState(data)
-    const [dropDownVisible,setDropDownVisible] = useState(false)
+    const [projects,setProjects] = useState(data);
+    const [dropDownVisible,setDropDownVisible] = useState(false);
+    const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } | null>(null);
+    const [filtersVisible,setFiltersVisible] = useState(false)
 
+
+    const sortProjects = (key:string) => {
+      const sortedProjects = [...projects];
+
+        if(sortConfig && sortConfig.key === key && sortConfig.direction === 'asc'){
+            sortedProjects.sort((a,b)=> a[key] > b[key] ? 1 : -1)
+            setSortConfig({key, direction: 'desc'})
+        }else if(sortConfig && sortConfig.key === key && sortConfig.direction === 'desc'){
+          sortedProjects.sort((a,b)=> a[key] < b[key] ? 1 : -1)
+          setSortConfig({key, direction: 'asc'}) 
+        }
+        setProjects(sortedProjects)
+    }
         const handleSortOptionClick = (key:string) => {
-            setDropDownVisible(false)
+
+          sortProjects(key) ;
+          setDropDownVisible(false);
             
+            
+
         }
 
 
@@ -20,36 +40,102 @@ const ProjectTable = () => {
                  {/* Sorting */}
       <div className="flex items-center mb-5">
         <div className="relative">
-          <button onclick={() => setDropDownVisible(!dropDownVisible)}
+          <button onClick={() =>  setDropDownVisible(!dropDownVisible)}
            
             className="border border-gray-700 flex items-center justify-center text-white p-2 rounded"
           >
             <BiSort className="mr-[0.3rem]" />
             Sort
-            <AiOutlineDown className="ml-2" />
+            
+            {dropDownVisible ? (<AiOutlineUp className="ml-2"  />):(<AiOutlineDown className=" ml-2" />)}
           </button>
-          </div>
-        {dropDownVisible && (
-            <div className="absolute top-full left-0 mt-2 bg-gray-800 border border-gray-700 rounded shadow-lg">
+          {dropDownVisible && (
+            <div className="absolute top-full left-0 mt-2 bg-gray-800 border border-gray-700 rounded shadow-lg p-4">
                 <button
                 onClick={()=> handleSortOptionClick("click")} 
-                className="block px-4 py-2 text-white hover:bg-gray-700 w-full" >Sort by Name
+                className="block px-4 py-2 text-white hover:bg-gray-700 w-full" >Name
 
                 </button>
                 <button
                 onClick={()=> handleSortOptionClick("date")} 
-                className="block px-4 py-2 text-white hover:bg-gray-700 w-full" >Sort by Date
+                className="block px-4 py-2 text-white hover:bg-gray-700 w-full" >Date
 
                 </button>
                 <button
                 onClick={()=> handleSortOptionClick("country")} 
-                className="block px-4 py-2 text-white hover:bg-gray-700 w-full" >Sort by Country
+                className="block px-4 py-2 text-white hover:bg-gray-700 w-full" >Country
 
                 </button>
+                
             </div>
         )}
+          </div>
+       
+
+ {/* Filters */}
+ <div className="relative ml-4 w-full">
+          <button
+            onClick={() => setFiltersVisible(!filtersVisible)}
+            className="border border-gray-700 flex items-center justify-center text-white p-2 rounded"
+          >
+            <MdSort className="mr-[0.3rem]" />
+            Filters
+            {filtersVisible ? (<AiOutlineUp className="ml-2"  />):(<AiOutlineDown className=" ml-2" />)}
+          </button>
+          {filtersVisible && (
+            <div className="absolute top-full left-0 mt-2 bg-gray-800 border border-gray-700 rounded shadow-lg p-4">
+              <div className="mb-2">
+                <label className="block text-white">Filter by Name:</label>
+                <input
+                  type="text"
+                  name="name"
+                
+                  className="bg-gray-900 text-white rounded p-2 w-full"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block text-white">Filter by Country:</label>
+                <input
+                  type="text"
+                  name="country"
+                 
+                  className="bg-gray-900 text-white rounded p-2 w-full"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block text-white">Filter by Email:</label>
+                <input
+                  type="text"
+                  name="email"
+                  
+                  className="bg-gray-900 text-white rounded p-2 w-full"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block text-white">Filter by Project:</label>
+                <input
+                  type="text"
+                  name="project"
+                 
+                  className="bg-gray-900 text-white rounded p-2 w-full"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block text-white">Filter by Status:</label>
+                <input
+                  type="text"
+                  name="status"
+                  
+                  className="bg-gray-900 text-white rounded p-2 w-full"
+                />
+              </div>
+            </div>
+          )}
+        </div>
 
         </div>
+
+       
 
          {/* Main Table */}
       <table className="min-w-full table-auto rounded border border-gray-700 text-white">
