@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { ChangeEvent, useState } from "react"
 import { data } from "../utils/data"
 import { BsThreeDots } from "react-icons/bs"
 import { AiOutlineDown, AiOutlineUp } from "react-icons/ai"
@@ -9,9 +9,13 @@ const ProjectTable = () => {
 
     const [projects,setProjects] = useState(data);
     const [dropDownVisible,setDropDownVisible] = useState(false);
-    const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } | null>(null);
-    const [filtersVisible,setFiltersVisible] = useState(false)
+   
+    
+    
+  
+// sorting
 
+const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } | null>(null);
 
     const sortProjects = (key:string) => {
       const sortedProjects = [...projects];
@@ -19,7 +23,7 @@ const ProjectTable = () => {
         if(sortConfig && sortConfig.key === key && sortConfig.direction === 'asc'){
             sortedProjects.sort((a,b)=> a[key] > b[key] ? 1 : -1)
             setSortConfig({key, direction: 'desc'})
-        }else if(sortConfig && sortConfig.key === key && sortConfig.direction === 'desc'){
+        }else{
           sortedProjects.sort((a,b)=> a[key] < b[key] ? 1 : -1)
           setSortConfig({key, direction: 'asc'}) 
         }
@@ -28,17 +32,54 @@ const ProjectTable = () => {
         const handleSortOptionClick = (key:string) => {
 
           sortProjects(key) ;
+          
           setDropDownVisible(false);
-            
-            
 
         }
+         
+        // filter
+        const [filtersVisible,setFiltersVisible] = useState(false)
+        const [searchQuery,setSearchQuery] = useState('')
+        const [filter,setFilter] = useState({
+          name:'',
+          country:'',
+          status:'',
+          email:'',
+          project:'',
+        })
+        const handleFilterChange = (e:ChangeEvent<HTMLInputElement>)=>{
 
+            setFilter({...filter,[e.target.name]:e.target.value})
+          };
+          const filteredProduct = projects.filter(
+            (project) => 
+           (searchQuery === "" || Object.values(project).some((value)=> value.toLowerCase().includes(searchQuery.toLowerCase())))
+            && (filter.name === "" || project.country.toLowerCase().includes(filter.country.toLowerCase()))
+            && (filter.status === "" || project.status.toLowerCase().includes(filter.status.toLowerCase()))
+            && (filter.email === "" || project.email.toLowerCase().includes(filter.email.toLowerCase()))
+            && (filter.project === "" || project.project.toLowerCase().includes(filter.project.toLowerCase()))
+          );
+        
+
+          // pagination
+          
+    const [currentPage, setCurrentPage] = useState(1);
+
+          const itemsPerPage = 5;
+          const startIndex = (currentPage - 1) * itemsPerPage;
+          const currentProject = filteredProduct.slice(startIndex, startIndex + itemsPerPage);
+          const totalPage = Math.ceil(filteredProduct.length/itemsPerPage)
+          const  handlePageChange = (page:number) => 
+            setCurrentPage(page);
+          
 
   return (
+
     <div className="p-4 w-[93%] ml-[5rem]">
-                 {/* Sorting */}
       <div className="flex items-center mb-5">
+                
+                 {/* Sorting */}
+
         <div className="relative">
           <button onClick={() =>  setDropDownVisible(!dropDownVisible)}
            
@@ -89,7 +130,8 @@ const ProjectTable = () => {
                 <input
                   type="text"
                   name="name"
-                
+                  value={filter.name}
+                  onChange={handleFilterChange}
                   className="bg-gray-900 text-white rounded p-2 w-full"
                 />
               </div>
@@ -98,7 +140,8 @@ const ProjectTable = () => {
                 <input
                   type="text"
                   name="country"
-                 
+                  value={filter.country}
+                  onChange={handleFilterChange}
                   className="bg-gray-900 text-white rounded p-2 w-full"
                 />
               </div>
@@ -107,7 +150,8 @@ const ProjectTable = () => {
                 <input
                   type="text"
                   name="email"
-                  
+                  value={filter.email}
+                  onChange={handleFilterChange}
                   className="bg-gray-900 text-white rounded p-2 w-full"
                 />
               </div>
@@ -116,7 +160,8 @@ const ProjectTable = () => {
                 <input
                   type="text"
                   name="project"
-                 
+                  value={filter.project}
+                  onChange={handleFilterChange}
                   className="bg-gray-900 text-white rounded p-2 w-full"
                 />
               </div>
@@ -125,7 +170,8 @@ const ProjectTable = () => {
                 <input
                   type="text"
                   name="status"
-                  
+                  value={filter.status}
+                  onChange={handleFilterChange}
                   className="bg-gray-900 text-white rounded p-2 w-full"
                 />
               </div>
@@ -154,7 +200,7 @@ const ProjectTable = () => {
         </thead>
         <tbody>
    
-   {projects.map((project, index) => (
+   {currentProject.map((project, index) => (
     <tr key={index} className="border border-gray-700">
     <td className="px-4 py-2">
       <img src={project.image} alt=""  className="w-[3rem] h-[3rem] object-cover rounded-full" />
@@ -193,16 +239,18 @@ const ProjectTable = () => {
       {/* Pagination */}
       <div className="flex justify-end mt-4">
         <button
-        
+        disabled={currentPage === 1}
+        onClick={()=> handlePageChange(currentPage - 1)}
           className="px-4 py-2 bg-gray-700 text-white rounded mr-2 disabled:opacity-50"
         >
           Previous
         </button>
         <span className="px-4 py-2 text-white">
-          {/* Page {currentPage} of {totalPages} */}
+          Page {currentPage} of {totalPage}
         </span>
         <button
-         
+         disabled={currentPage === totalPage}
+         onClick={()=> handlePageChange(currentPage + 1)}
           className="px-4 py-2 bg-gray-700 text-white rounded ml-2 disabled:opacity-50"
         >
           Next
