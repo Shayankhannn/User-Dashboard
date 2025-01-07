@@ -20,12 +20,12 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
     const sortProjects = (key:string) => {
       const sortedProjects = [...projects];
 
-        if(sortConfig && sortConfig.key === key && sortConfig.direction === 'asc'){
-            sortedProjects.sort((a,b)=> a[key] > b[key] ? 1 : -1)
-            setSortConfig({key, direction: 'desc'})
-        }else{
-          sortedProjects.sort((a,b)=> a[key] < b[key] ? 1 : -1)
-          setSortConfig({key, direction: 'asc'}) 
+        if(sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+          sortedProjects.sort((a, b) => (a[key] > b[key] ? -1 : 1));
+          setSortConfig({ key, direction: "desc" });
+        } else {
+          sortedProjects.sort((a, b) => (a[key] > b[key] ? 1 : -1));
+          setSortConfig({ key, direction: "asc" });
         }
         setProjects(sortedProjects)
     }
@@ -54,9 +54,10 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
           const filteredProduct = projects.filter(
             (project) => 
            (searchQuery === "" || Object.values(project).some((value)=> value.toLowerCase().includes(searchQuery.toLowerCase())))
-            && (filter.name === "" || project.country.toLowerCase().includes(filter.country.toLowerCase()))
+            && (filter.name === "" || project.client.toLowerCase().includes(filter.name.toLowerCase()))
             && (filter.status === "" || project.status.toLowerCase().includes(filter.status.toLowerCase()))
             && (filter.email === "" || project.email.toLowerCase().includes(filter.email.toLowerCase()))
+            && (filter.country === "" || project.country.toLowerCase().includes(filter.country.toLowerCase()))
             && (filter.project === "" || project.project.toLowerCase().includes(filter.project.toLowerCase()))
           );
         
@@ -93,7 +94,7 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
           {dropDownVisible && (
             <div className="absolute top-full left-0 mt-2 bg-gray-800 border border-gray-700 rounded shadow-lg p-4">
                 <button
-                onClick={()=> handleSortOptionClick("click")} 
+                onClick={()=> handleSortOptionClick("name")} 
                 className="block px-4 py-2 text-white hover:bg-gray-700 w-full" >Name
 
                 </button>
@@ -126,7 +127,15 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
           {filtersVisible && (
             <div className="absolute top-full left-0 mt-2 bg-gray-800 border border-gray-700 rounded shadow-lg p-4">
               <div className="mb-2">
-                <label className="block text-white">Filter by Name:</label>
+              <label className="block text-white">Filter Globally :</label>
+              <input
+  type="text"
+  placeholder="Search..."
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+  className="bg-gray-900 text-white rounded p-2 w-full"
+/>
+                <label className="block text-white">Filter by Name :</label>
                 <input
                   type="text"
                   name="name"
@@ -136,7 +145,7 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
                 />
               </div>
               <div className="mb-2">
-                <label className="block text-white">Filter by Country:</label>
+                <label className="block text-white">Filter by Country :</label>
                 <input
                   type="text"
                   name="country"
@@ -146,7 +155,7 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
                 />
               </div>
               <div className="mb-2">
-                <label className="block text-white">Filter by Email:</label>
+                <label className="block text-white">Filter by Email :</label>
                 <input
                   type="text"
                   name="email"
@@ -156,7 +165,7 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
                 />
               </div>
               <div className="mb-2">
-                <label className="block text-white">Filter by Project:</label>
+                <label className="block text-white">Filter by Project :</label>
                 <input
                   type="text"
                   name="project"
@@ -166,7 +175,7 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
                 />
               </div>
               <div className="mb-2">
-                <label className="block text-white">Filter by Status:</label>
+                <label className="block text-white">Filter by Status :</label>
                 <input
                   type="text"
                   name="status"
