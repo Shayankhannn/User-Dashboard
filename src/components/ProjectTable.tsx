@@ -25,7 +25,7 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
           setSortConfig({ key, direction: "desc" });
         } else {
           sortedProjects.sort((a, b) => (a[key] > b[key] ? 1 : -1));
-          setSortConfig({ key, direction: "asc" });
+          setSortConfig({ key, direction: "asc" });   
         }
         setProjects(sortedProjects)
     }
@@ -73,6 +73,22 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
           const  handlePageChange = (page:number) => 
             setCurrentPage(page);
           
+          // status change
+          const [statusDropDown,setStatusDropDown] = useState<number | null>(null); 
+          const handleStatusChange = (index:number,newStatus:string) => {
+            const startIndex = (currentPage - 1) * itemsPerPage; 
+  const globalIndex = startIndex + index;
+            const updatedProjects = projects.map((project, i) => 
+            i === globalIndex ? {
+               ...project,
+                status: newStatus,
+                progress: newStatus === "Completed" ? "100%" : Math.floor(Math.random() * 100) + "%", 
+
+             } : project
+          );
+          setProjects(updatedProjects)
+          setStatusDropDown(null)
+          }
 
   return (
 
@@ -229,13 +245,35 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
               </td>
               <td className="px-4 py-2 w-[10rem]">
                 <span  className={`px-2 py-1 text-white rounded ${
-      project.status === "Completed" ? "bg-green-500" : "bg-yellow-400"
+      project.status === "Completed" ? "text-green-500" : "text-yellow-400"
     }`}>{project.status}</span>
               </td>
                 <td className="px-4 py-2">{project.date}</td>
                 <td className="px-4 py-2"> 
-                    <div className="relative">
+                    <div className="relative"
+                    onClick={() => setStatusDropDown(statusDropDown === index ? null : index)}
+                    >
                     <BsThreeDots className="cursor-pointer" />
+
+
+                    {statusDropDown === index && (
+                       <div 
+                       className="absolute top-full -left-12 z-10 mt-2 bg-gray-800 border border-gray-700 rounded shadow-lg p-4"
+                       onClick={(e) => e.stopPropagation()} >
+                       <button
+                       onClick={()=> handleStatusChange(index, "Completed")} 
+                       className="block px-4 py-2 text-white hover:bg-gray-700 w-full " >Completed
+       
+                       </button>
+                       <button
+                       onClick={()=> handleStatusChange(index, "In Progress")} 
+                       className="block px-4 py-2 text-white hover:bg-gray-700 w-full text-[15px]" >In Progress
+       
+                       </button>
+                     
+                       
+                   </div>
+                    )}
                     </div>
                 </td>
     </tr>
