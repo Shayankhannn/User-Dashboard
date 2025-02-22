@@ -5,6 +5,7 @@ import { AiOutlineDown, AiOutlineUp } from "react-icons/ai"
 import { BiSort } from "react-icons/bi"
 import { MdSort } from "react-icons/md"
 
+
 const ProjectTable = () => {
 
     const [projects,setProjects] = useState(data);
@@ -91,7 +92,7 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
           }
 
   return (
-
+<>
     <div className="p-4 w-[93%] ml-[5rem]">
       <div className="flex items-center mb-5">
                 
@@ -306,7 +307,9 @@ const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } 
 
 
     </div>
-  )
+ 
+  </>  
+)
 }
 
 export default ProjectTable
